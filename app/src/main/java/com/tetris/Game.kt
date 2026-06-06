@@ -6,7 +6,7 @@ import kotlin.random.Random
 enum class GameState { READY, PLAYING, PAUSED, GAME_OVER }
 
 /**
- * Central game state machine â€” scoring, levels, lock delay, hold, 7-bag.
+ * Central game state machine â€?scoring, levels, lock delay, hold, 7-bag.
  */
 class Game {
 
@@ -51,7 +51,7 @@ class Game {
         if (nextPiece != null) {
             current = nextPiece
         } else {
-            current = Tetromino(nextFromBag())
+            current = Tetromino.create(nextFromBag())
             current!!.resetPosition()
         }
 
@@ -61,7 +61,7 @@ class Game {
             return
         }
 
-        nextPiece = Tetromino(nextFromBag())
+        nextPiece = Tetromino.create(nextFromBag())
         nextPiece!!.resetPosition()
         isLocking = false
         lockTimer = 0f
@@ -124,15 +124,15 @@ class Game {
 
         if (holdPiece != null) {
             val holdType = holdPiece!!.type
-            holdPiece = Tetromino(curType).also { it.resetPosition() }
-            current = Tetromino(holdType).also { it.resetPosition() }
+            holdPiece = Tetromino.create(curType).also { it.resetPosition() }
+            current = Tetromino.create(holdType).also { it.resetPosition() }
             if (board.isCollision(current!!)) {
                 state = GameState.GAME_OVER
                 saveHighScore()
                 return
             }
         } else {
-            holdPiece = Tetromino(curType).also { it.resetPosition() }
+            holdPiece = Tetromino.create(curType).also { it.resetPosition() }
             spawn()
         }
         holdUsed = true

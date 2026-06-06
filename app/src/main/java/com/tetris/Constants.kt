@@ -19,6 +19,7 @@ val SCORE_TABLE = mapOf(1 to 100, 2 to 300, 3 to 500, 4 to 800)
 
 // ── Colours (ARGB) ─────────────────────────────────────
 const val BG_COLOR = 0xFF1a1a2e.toInt()
+const val GRID_COLOR = 0x33FFFFFF.toInt()
 const val PANEL_BG = 0x22FFFFFF.toInt()
 const val WHITE = 0xFFFFFFFF.toInt()
 const val DARK_GRAY = 0xFF666666.toInt()

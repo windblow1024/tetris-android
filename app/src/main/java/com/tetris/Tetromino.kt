@@ -102,6 +102,13 @@ data class Tetromino(
             return if (type == 'I') KICKS_I[key] ?: listOf(0 to 0)
                    else KICKS_JLSTZ[key] ?: listOf(0 to 0)
         }
+
+        /** Create a new Tetromino with default spawn position. */
+        fun create(type: Char): Tetromino {
+            val x = SPAWN_X[type] ?: 3
+            val y = SPAWN_Y[type] ?: -1
+            return Tetromino(type, x, y, 0)
+        }
     }
 
     // ── Instance helpers ──────────────────────────────────
@@ -111,7 +118,7 @@ data class Tetromino(
         get() = getShapes(type)[rotation]
 
     /** Return the colour for this piece type. */
-    val color: Int get() = Constants.PIECE_COLORS[type] ?: Constants.WHITE
+    val color: Int get() = PIECE_COLORS[type] ?: WHITE
 
     /** Deep clone. */
     fun copy(): Tetromino = Tetromino(type, x, y, rotation)
