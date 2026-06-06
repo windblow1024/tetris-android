@@ -347,7 +347,7 @@ class TetrisView @JvmOverloads constructor(
         val ph = cellSize * 3f + 44f
         drawPanelBg(canvas, cx, top, pw, ph)
 
-        textPaint.color = 0x88FFFFFF.toInt(); textPaint.textSize = 16f
+        textPaint.color = 0x88FFFFFF.toInt(); textPaint.textSize = 22f
         textPaint.textAlign = Paint.Align.CENTER
         canvas.drawText("HOLD", cx, top + 24f, textPaint)
 
@@ -363,7 +363,7 @@ class TetrisView @JvmOverloads constructor(
         val ph = cellSize * 3f + 44f
         drawPanelBg(canvas, cx, top, pw, ph)
 
-        textPaint.color = 0x88FFFFFF.toInt(); textPaint.textSize = 16f
+        textPaint.color = 0x88FFFFFF.toInt(); textPaint.textSize = 22f
         textPaint.textAlign = Paint.Align.CENTER
         canvas.drawText("NEXT", cx, top + 24f, textPaint)
 
@@ -398,41 +398,44 @@ class TetrisView @JvmOverloads constructor(
         val ph = cellSize * 5.5f
         drawPanelBg(canvas, cx, top, pw, ph)
 
-        textPaint.color = 0x88FFFFFF.toInt(); textPaint.textSize = 15f
-        textPaint.textAlign = Paint.Align.LEFT
+        val labelSize = 16f
+        val valueSize = 42f
         val xx = cx - pw / 2 + 14f
         val lineH = (ph - 32f) / 4f
 
         // SCORE
+        textPaint.color = 0x88FFFFFF.toInt(); textPaint.textSize = labelSize
+        textPaint.textAlign = Paint.Align.LEFT
         canvas.drawText("SCORE", xx, top + 24f, textPaint)
-        textPaint.color = 0xFFFFCC00.toInt(); textPaint.textSize = 34f
-        canvas.drawText("${game.score}", xx, top + 56f, textPaint)
+        textPaint.color = 0xFFFFCC00.toInt(); textPaint.textSize = valueSize
+        canvas.drawText("${game.score}", xx, top + 66f, textPaint)
 
         // BEST
-        textPaint.color = 0x88FFFFFF.toInt(); textPaint.textSize = 15f
+        textPaint.color = 0x88FFFFFF.toInt(); textPaint.textSize = labelSize
         canvas.drawText("BEST", xx, top + lineH + 24f, textPaint)
-        textPaint.color = WHITE; textPaint.textSize = 30f
-        canvas.drawText("${game.highScore}", xx, top + lineH + 56f, textPaint)
+        textPaint.color = WHITE; textPaint.textSize = valueSize
+        canvas.drawText("${game.highScore}", xx, top + lineH + 66f, textPaint)
 
         // LEVEL
-        textPaint.color = 0x88FFFFFF.toInt(); textPaint.textSize = 15f
+        textPaint.color = 0x88FFFFFF.toInt(); textPaint.textSize = labelSize
         canvas.drawText("LEVEL", xx, top + lineH * 2 + 24f, textPaint)
-        textPaint.color = 0xFF66FF88.toInt(); textPaint.textSize = 30f
-        canvas.drawText("${game.level}", xx, top + lineH * 2 + 56f, textPaint)
+        textPaint.color = 0xFF66FF88.toInt(); textPaint.textSize = valueSize
+        canvas.drawText("${game.level}", xx, top + lineH * 2 + 66f, textPaint)
 
         // LINES
-        textPaint.color = 0x88FFFFFF.toInt(); textPaint.textSize = 15f
+        textPaint.color = 0x88FFFFFF.toInt(); textPaint.textSize = labelSize
         canvas.drawText("LINES", xx, top + lineH * 3 + 24f, textPaint)
-        textPaint.color = WHITE; textPaint.textSize = 30f
-        canvas.drawText("${game.linesCleared}", xx, top + lineH * 3 + 56f, textPaint)
+        textPaint.color = WHITE; textPaint.textSize = valueSize
+        canvas.drawText("${game.linesCleared}", xx, top + lineH * 3 + 66f, textPaint)
     }
 
-    // ── Ghost toggle — tappable ───────────────────────
+    // ── Ghost toggle — full-width tappable bar ────────
     private fun drawGhostIndicator(canvas: Canvas) {
-        val cx = panelCenterX
-        val pw = 80f
-        val ph = 26f
-        val topBtn = btnBarTop - 34f
+        val w = width.toFloat()
+        val pw = w * 0.40f
+        val ph = 32f
+        val cx = w / 2f
+        val topBtn = btnBarTop - 38f
         ghostBtn.set(cx - pw / 2, topBtn - ph, cx + pw / 2, topBtn + 4f)
 
         val enabled = game.ghostEnabled
@@ -445,9 +448,10 @@ class TetrisView @JvmOverloads constructor(
         panelStrokePaint.color = borderColor
         canvas.drawRoundRect(ghostBtn, r, r, panelStrokePaint)
 
-        textPaint.textSize = 13f; textPaint.textAlign = Paint.Align.CENTER
+        textPaint.textAlign = Paint.Align.CENTER
+        textPaint.textSize = 17f
         textPaint.color = if (enabled) 0xFF88FFAA.toInt() else 0xFF888888.toInt()
-        canvas.drawText(if (enabled) "👻 ON" else "👻 OFF", cx, topBtn, textPaint)
+        canvas.drawText(if (enabled) "👻 幽灵  ON  ▶" else "👻 幽灵 OFF ◀", cx, topBtn, textPaint)
     }
 
     // ── Buttons ─────────────────────────────────────────
@@ -534,25 +538,25 @@ class TetrisView @JvmOverloads constructor(
         canvas.drawRect(0f, 0f, w, h, overlayPaint)
 
         // Title
-        textPaintShadow.textSize = 60f; textPaintShadow.textAlign = Paint.Align.CENTER
-        textPaint.textSize = 60f; textPaint.textAlign = Paint.Align.CENTER
+        textPaintShadow.textSize = 72f; textPaintShadow.textAlign = Paint.Align.CENTER
+        textPaint.textSize = 72f; textPaint.textAlign = Paint.Align.CENTER
 
         // Shadow layer
         textPaintShadow.color = 0x40000000.toInt()
-        canvas.drawText("TETRIS", w / 2f + 3f, h * 0.32f + 3f, textPaintShadow)
-        textPaint.textSize = 60f; textPaint.color = 0xFF66CCFF.toInt()
-        canvas.drawText("TETRIS", w / 2f, h * 0.32f, textPaint)
+        canvas.drawText("TETRIS", w / 2f + 3f, h * 0.30f + 3f, textPaintShadow)
+        textPaint.textSize = 72f; textPaint.color = 0xFF66CCFF.toInt()
+        canvas.drawText("TETRIS", w / 2f, h * 0.30f, textPaint)
 
         // Subtitle
-        textPaint.color = 0x99FFFFFF.toInt(); textPaint.textSize = 20f
-        canvas.drawText("Tap to start  |  Best: ${game.highScore}", w / 2f, h * 0.395f, textPaint)
+        textPaint.color = 0x99FFFFFF.toInt(); textPaint.textSize = 24f
+        canvas.drawText("Tap to start  |  Best: ${game.highScore}", w / 2f, h * 0.38f, textPaint)
 
         // Controls hint
-        textPaint.color = 0x55FFFFFF.toInt(); textPaint.textSize = 15f
-        val hints = arrayOf("←→ Move  |  ↑ Rotate  |  ↓ Soft  |  ␣ Hard  |  C Hold")
-        val yy = h * 0.75f
+        textPaint.color = 0x66FFFFFF.toInt(); textPaint.textSize = 20f
+        val hints = arrayOf("←→ 移动  ≀  ↻ 旋转  ≀  ▼ 软降  ≀  ⬇ 硬降  ≀  C 暂存")
+        val yy = h * 0.74f
         for ((i, line) in hints.withIndex()) {
-            canvas.drawText(line, w / 2f, yy + i * 18f, textPaint)
+            canvas.drawText(line, w / 2f, yy + i * 26f, textPaint)
         }
     }
 
@@ -568,20 +572,20 @@ class TetrisView @JvmOverloads constructor(
         val title = if (isOver) "GAME OVER" else "PAUSED"
         val titleColor = if (isOver) 0xFFFF6666.toInt() else 0xFF66CCFF.toInt()
 
-        textPaint.textSize = 42f; textPaint.color = titleColor
-        textPaintShadow.textSize = 42f; textPaintShadow.color = 0x40000000.toInt()
+        textPaint.textSize = 52f; textPaint.color = titleColor
+        textPaintShadow.textSize = 52f; textPaintShadow.color = 0x40000000.toInt()
         canvas.drawText(title, l + bw / 2f + 2f, t + bh * 0.30f + 2f, textPaintShadow)
         canvas.drawText(title, l + bw / 2f, t + bh * 0.30f, textPaint)
 
         if (isOver) {
-            textPaint.textSize = 28f; textPaint.color = 0xFFFFCC00.toInt()
-            canvas.drawText("Score: ${game.score}", l + bw / 2f, t + bh * 0.42f, textPaint)
-            textPaint.textSize = 22f; textPaint.color = 0x99FFFFFF.toInt()
-            canvas.drawText("Best: ${game.highScore}", l + bw / 2f, t + bh * 0.50f, textPaint)
-            textPaint.textSize = 18f; textPaint.color = 0x77FFFFFF.toInt()
-            canvas.drawText("Tap to restart", l + bw / 2f, t + bh * 0.60f, textPaint)
+            textPaint.textSize = 34f; textPaint.color = 0xFFFFCC00.toInt()
+            canvas.drawText("Score: ${game.score}", l + bw / 2f, t + bh * 0.43f, textPaint)
+            textPaint.textSize = 26f; textPaint.color = 0x99FFFFFF.toInt()
+            canvas.drawText("Best: ${game.highScore}", l + bw / 2f, t + bh * 0.52f, textPaint)
+            textPaint.textSize = 24f; textPaint.color = 0x77FFFFFF.toInt()
+            canvas.drawText("Tap to restart", l + bw / 2f, t + bh * 0.63f, textPaint)
         } else {
-            textPaint.textSize = 20f; textPaint.color = 0x99FFFFFF.toInt()
+            textPaint.textSize = 26f; textPaint.color = 0x99FFFFFF.toInt()
             canvas.drawText("Press P to continue", l + bw / 2f, t + bh * 0.44f, textPaint)
         }
     }
