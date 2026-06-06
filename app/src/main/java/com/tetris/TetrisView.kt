@@ -242,13 +242,35 @@ class TetrisView @JvmOverloads constructor(
         val x = boardLeft + col * cellSize + 1f
         val y = boardTop + row * cellSize + 1f
         val s = cellSize - 2f
-        cellFillPaint.color = cellColor; canvas.drawRect(x, y, x + s, y + s, cellFillPaint)
-        cellHlPaint.color = lighten(cellColor, 0.35f); cellHlPaint.alpha = 60
-        canvas.drawRect(x, y, x + s, y + s * 0.22f, cellHlPaint)
-        cellHlPaint.color = darken(cellColor, 0.25f); cellHlPaint.alpha = 80
-        canvas.drawRect(x, y + s * 0.8f, x + s, y + s, cellHlPaint)
-        cellBorderPaint.color = lighten(cellColor, 0.5f)
-        canvas.drawRect(x, y, x + s, y + s, cellBorderPaint)
+        val bevel = (cellSize * 0.12f).coerceAtLeast(2f)
+
+        // 1. Base fill
+        cellFillPaint.color = cellColor
+        canvas.drawRect(x, y, x + s, y + s, cellFillPaint)
+
+        // 2. Top edge — bright highlight
+        cellHlPaint.color = lighten(cellColor, 0.45f); cellHlPaint.alpha = 200
+        canvas.drawRect(x, y, x + s, y + bevel, cellHlPaint)
+
+        // 3. Left edge — bright highlight
+        canvas.drawRect(x, y, x + bevel, y + s, cellHlPaint)
+
+        // 4. Top-left corner intersection (clean up)
+        canvas.drawRect(x, y, x + bevel, y + bevel, cellHlPaint)
+
+        // 5. Bottom edge — dark shadow
+        cellHlPaint.color = darken(cellColor, 0.4f); cellHlPaint.alpha = 200
+        canvas.drawRect(x, y + s - bevel, x + s, y + s, cellHlPaint)
+
+        // 6. Right edge — dark shadow
+        canvas.drawRect(x + s - bevel, y, x + s, y + s, cellHlPaint)
+
+        // 7. Bottom-right intersection shadow
+        canvas.drawRect(x + s - bevel, y + s - bevel, x + s, y + s, cellHlPaint)
+
+        // 8. Subtle inner shine (top-left corner inset)
+        cellHlPaint.color = lighten(cellColor, 0.6f); cellHlPaint.alpha = 50
+        canvas.drawRect(x + bevel, y + bevel, x + bevel + s * 0.3f, y + bevel + s * 0.3f, cellHlPaint)
     }
 
     private fun drawPiece(canvas: Canvas, p: Tetromino) {
@@ -303,12 +325,21 @@ class TetrisView @JvmOverloads constructor(
         val shape = Tetromino.getShapes(p.type)[0]
         val rows = shape.size; val cols = shape[0].size
         val ox = cx - cols * scale / 2f; val oy = top + (cellSize * 1.5f - rows * scale) / 2f
+        val bevel = (scale * 0.18f).coerceAtLeast(1.5f)
         miniPaint.color = p.color
         for (r in 0 until rows) for (c in 0 until cols) {
             if (shape[r][c] == 0) continue
             val x = ox + c * scale; val y = oy + r * scale
+            // Base
             canvas.drawRect(x, y, x + scale, y + scale, miniPaint)
-            canvas.drawRect(x, y, x + scale, y + scale * 0.2f, miniHlPaint)
+            // Top-left highlight
+            miniHlPaint.color = lighten(p.color, 0.45f); miniHlPaint.alpha = 180
+            canvas.drawRect(x, y, x + scale, y + bevel, miniHlPaint)
+            canvas.drawRect(x, y, x + bevel, y + scale, miniHlPaint)
+            // Bottom-right shadow
+            miniHlPaint.color = darken(p.color, 0.4f); miniHlPaint.alpha = 180
+            canvas.drawRect(x, y + scale - bevel, x + scale, y + scale, miniHlPaint)
+            canvas.drawRect(x + scale - bevel, y, x + scale, y + scale, miniHlPaint)
         }
     }
 
