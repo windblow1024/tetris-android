@@ -9,7 +9,7 @@ import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
-import com.tetris.Constants.*
+import com.tetris.*
 import kotlin.math.abs
 
 /**

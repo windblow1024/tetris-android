@@ -1,6 +1,6 @@
 package com.tetris
 
-import com.tetris.Constants.*
+import com.tetris.*
 import kotlin.random.Random
 
 enum class GameState { READY, PLAYING, PAUSED, GAME_OVER }

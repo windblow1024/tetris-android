@@ -1,6 +1,6 @@
 package com.tetris
 
-import com.tetris.Constants.*
+import com.tetris.*
 
 /**
  * 10×22 grid (2 hidden rows above visible area).
