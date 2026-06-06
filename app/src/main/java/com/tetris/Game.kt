@@ -6,7 +6,7 @@ import kotlin.random.Random
 enum class GameState { READY, PLAYING, PAUSED, GAME_OVER }
 
 /**
- * Central game state machine â€?scoring, levels, lock delay, hold, 7-bag.
+ * Central game state machine ï¿½?scoring, levels, lock delay, hold, 7-bag.
  */
 class Game {
 
@@ -82,8 +82,8 @@ class Game {
         state = GameState.PLAYING
     }
 
-    fun moveLeft(): Boolean = move(0, -1)
-    fun moveRight(): Boolean = move(0, 1)
+    fun moveLeft(): Boolean = move(-1, 0)
+    fun moveRight(): Boolean = move(1, 0)
     fun softDrop(): Boolean {
         val p = current ?: return false
         if (!board.isCollision(p, dy = 1)) {

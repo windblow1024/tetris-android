@@ -236,7 +236,7 @@ class TetrisView @JvmOverloads constructor(
         for (r in shape.indices) {
             for (c in shape[r].indices) {
                 if (shape[r][c] == 0) continue
-                val boardRow = p.y + r
+                val boardRow = p.y + r - HIDDEN_ROWS
                 if (boardRow < 0) continue
                 drawCell(canvas, p.x + c, boardRow, p.color)
             }
@@ -251,7 +251,7 @@ class TetrisView @JvmOverloads constructor(
         for (r in shape.indices) {
             for (c in shape[r].indices) {
                 if (shape[r][c] == 0) continue
-                val boardRow = gy + r
+                val boardRow = gy + r - HIDDEN_ROWS
                 if (boardRow < 0) continue
                 val x = boardLeft + (p.x + c) * cellSize + 2f
                 val y = boardTop + boardRow * cellSize + 2f
