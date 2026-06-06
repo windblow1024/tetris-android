@@ -119,11 +119,10 @@ class TetrisView @JvmOverloads constructor(
         val usableW = w.toFloat()
         val usableH = h.toFloat()
 
-        // Reserve space for control buttons at bottom (~13 % of height)
-        val controlH = (usableH * 0.13f).coerceAtLeast(80f)
+        // Bottom control area (~20 % of height, 2 rows)
+        val controlH = (usableH * 0.20f).coerceAtLeast(140f)
         btnBarTop = usableH - controlH
         val gameH = btnBarTop
-        btnSize = (usableW / 6f).coerceAtMost(controlH * 0.75f)
 
         // Side panel takes ~28 % of width
         val panelW = usableW * 0.28f
@@ -139,15 +138,33 @@ class TetrisView @JvmOverloads constructor(
         boardTop = 4f
         panelCenterX = (panelLeft + panelRight) / 2f
 
-        // Button layout
-        val cw = usableW / 7f
-        val btnY = btnBarTop + (controlH - btnSize) / 2f
-        leftBtn.set(cw * 0.5f - btnSize / 2, btnY, cw * 0.5f + btnSize / 2, btnY + btnSize)
-        softBtn.set(cw * 1.5f - btnSize / 2, btnY, cw * 1.5f + btnSize / 2, btnY + btnSize)
-        rotateBtn.set(cw * 2.5f - btnSize / 2, btnY, cw * 2.5f + btnSize / 2, btnY + btnSize)
-        hardBtn.set(cw * 3.5f - btnSize / 2, btnY, cw * 3.5f + btnSize / 2, btnY + btnSize)
-        holdBtn.set(cw * 4.5f - btnSize / 2, btnY, cw * 4.5f + btnSize / 2, btnY + btnSize)
-        rightBtn.set(cw * 5.5f - btnSize / 2, btnY, cw * 5.5f + btnSize / 2, btnY + btnSize)
+        // ── 2-row button layout ─────────────────────────
+        // Row 2 (bottom, bigger):  [◀]  [▼]  [▶]
+        // Row 1 (top, smaller):    [▲]  [⬇]  [C]
+        val row2H = controlH * 0.55f
+        val row1H = controlH * 0.45f
+        val row2Y = btnBarTop + (controlH - row2H)
+        val row1Y = btnBarTop
+
+        val colW = usableW / 3.5f         // 3 buttons per row, with margins
+        val btnW = colW * 0.85f
+        val btnPad = (colW - btnW) / 2f
+
+        // Row 2: left / soft drop / right (big)
+        val btnH2 = row2H * 0.8f
+        leftBtn.set(btnPad, row2Y + (row2H - btnH2) / 2f, btnPad + btnW, row2Y + (row2H - btnH2) / 2f + btnH2)
+        softBtn.set(colW + btnPad, row2Y + (row2H - btnH2) / 2f, colW + btnPad + btnW, row2Y + (row2H - btnH2) / 2f + btnH2)
+        rightBtn.set(colW * 2 + btnPad, row2Y + (row2H - btnH2) / 2f, colW * 2 + btnPad + btnW, row2Y + (row2H - btnH2) / 2f + btnH2)
+
+        // Row 1: rotate / hard drop / hold (smaller)
+        val btnH1 = row1H * 0.75f
+        val colOffset = (usableW - colW * 3) / 2f     // centre row 1
+        rotateBtn.set(colOffset + btnPad, row1Y + (row1H - btnH1) / 2f, colOffset + btnPad + btnW, row1Y + (row1H - btnH1) / 2f + btnH1)
+        hardBtn.set(colOffset + colW + btnPad, row1Y + (row1H - btnH1) / 2f, colOffset + colW + btnPad + btnW, row1Y + (row1H - btnH1) / 2f + btnH1)
+        holdBtn.set(colOffset + colW * 2 + btnPad, row1Y + (row1H - btnH1) / 2f, colOffset + colW * 2 + btnPad + btnW, row1Y + (row1H - btnH1) / 2f + btnH1)
+
+        // Keep old btnSize for font sizing fallback
+        btnSize = btnW
     }
 
     // ── Draw ───────────────────────────────────────────
@@ -312,19 +329,31 @@ class TetrisView @JvmOverloads constructor(
 
     // ── Buttons ─────────────────────────────────────────
     private fun drawButtons(canvas: Canvas) {
-        val r = btnSize / 4f
-        fun drawBtn(rect: RectF, label: String) {
-            buttonPaint.color = 0x33FFFFFF.toInt()
-            canvas.drawRoundRect(rect, r, r, buttonPaint)
-            buttonTextPaint.textSize = btnSize * 0.45f
-            canvas.drawText(label, rect.centerX(), rect.centerY() + btnSize * 0.15f, buttonTextPaint)
+        data class BtnInfo(val rect: RectF, val label: String, val bgColor: Int)
+
+        val buttons = listOf(
+            BtnInfo(rotateBtn, "↻", 0x444444FF.toInt()),
+            BtnInfo(hardBtn,  "⬇⬇", 0x44FF4444.toInt()),
+            BtnInfo(holdBtn,  "C",  0x44FFFFFF.toInt()),
+            BtnInfo(leftBtn,  "◀",  0x44FFFFFF.toInt()),
+            BtnInfo(softBtn,  "▼",  0x44FFFFFF.toInt()),
+            BtnInfo(rightBtn, "▶",  0x44FFFFFF.toInt())
+        )
+
+        for (btn in buttons) {
+            val r = btn.rect.height() / 4f
+            buttonPaint.color = btn.bgColor
+            canvas.drawRoundRect(btn.rect, r, r, buttonPaint)
+
+            val fontSize = btn.rect.height() * 0.55f
+            buttonTextPaint.textSize = fontSize
+            canvas.drawText(
+                btn.label,
+                btn.rect.centerX(),
+                btn.rect.centerY() + fontSize * 0.35f,
+                buttonTextPaint
+            )
         }
-        drawBtn(leftBtn, "◀")
-        drawBtn(rightBtn, "▶")
-        drawBtn(softBtn, "▼")
-        drawBtn(rotateBtn, "▲")
-        drawBtn(hardBtn, "⬇")
-        drawBtn(holdBtn, "C")
     }
 
     // ── Overlays ────────────────────────────────────────
@@ -368,7 +397,7 @@ class TetrisView @JvmOverloads constructor(
                 when {
                     leftBtn.contains(x, y) -> { game.moveLeft(); startDAS("left") }
                     rightBtn.contains(x, y) -> { game.moveRight(); startDAS("right") }
-                    softBtn.contains(x, y) -> { game.softDrop(); startDAS("soft") }
+                    softBtn.contains(x, y) -> game.softDrop()
                     rotateBtn.contains(x, y) -> game.rotate()
                     hardBtn.contains(x, y) -> game.hardDrop()
                     holdBtn.contains(x, y) -> game.hold()
@@ -415,7 +444,6 @@ class TetrisView @JvmOverloads constructor(
         when (action) {
             "left" -> game.moveLeft()
             "right" -> game.moveRight()
-            "soft" -> game.softDrop()
         }
     }
 
