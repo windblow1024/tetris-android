@@ -51,7 +51,7 @@ class Board {
             if (full) {
                 cleared++
             } else {
-                if (writeRow != r) grid[writeRow] = grid[r]
+                if (writeRow != r) grid[writeRow] = grid[r].copyOf()
                 writeRow--
             }
         }
