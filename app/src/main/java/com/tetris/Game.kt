@@ -5,6 +5,11 @@ import kotlin.random.Random
 
 enum class GameState { READY, PLAYING, PAUSED, GAME_OVER }
 
+enum class GameEvent {
+    PIECE_MOVED, PIECE_ROTATED, SOFT_DROP, HARD_DROP,
+    LOCK, LINE_CLEAR, TETRIS, LEVEL_UP, GAME_OVER, HOLD
+}
+
 /**
  * Central game state machine �?scoring, levels, lock delay, hold, 7-bag.
  */
@@ -30,6 +35,7 @@ class Game {
     var isLocking = false
     var ghostEnabled = true
 
+    val events = mutableListOf<GameEvent>()
     private val bag = mutableListOf<Char>()
     private var highScoreLoaded = false
 
@@ -83,8 +89,8 @@ class Game {
         state = GameState.PLAYING
     }
 
-    fun moveLeft(): Boolean = move(-1, 0)
-    fun moveRight(): Boolean = move(1, 0)
+    fun moveLeft(): Boolean { val ok = move(-1, 0); if (ok) events.add(GameEvent.PIECE_MOVED); return ok }
+    fun moveRight(): Boolean { val ok = move(1, 0); if (ok) events.add(GameEvent.PIECE_MOVED); return ok }
     fun softDrop(): Boolean {
         val p = current ?: return false
         if (!board.isCollision(p, dy = 1)) {
@@ -92,6 +98,7 @@ class Game {
             dropTimer = 0f
             if (isLocking && !board.isCollision(p, dy = 1)) isLocking = false
             score += 1
+            events.add(GameEvent.SOFT_DROP)
             return true
         }
         return false
@@ -102,6 +109,7 @@ class Game {
         var dist = 0
         while (!board.isCollision(p, dy = 1)) { p.y += 1; dist++ }
         score += dist * 2
+        events.add(GameEvent.HARD_DROP)
         lock()
     }
 
@@ -113,6 +121,7 @@ class Game {
         for ((dx, dy) in kicks) {
             if (!board.isCollision(p, dx = dx, dy = dy, rotation = toRot)) {
                 p.x += dx; p.y += dy; p.rotation = toRot
+                events.add(GameEvent.PIECE_ROTATED)
                 onMove()
                 return
             }
@@ -122,6 +131,7 @@ class Game {
     fun hold() {
         if (holdUsed || current == null) return
         val curType = current!!.type
+        events.add(GameEvent.HOLD)
 
         if (holdPiece != null) {
             val holdType = holdPiece!!.type
@@ -216,14 +226,19 @@ class Game {
     private fun lock() {
         val p = current ?: return
         val aboveTop = board.lock(p)
+        events.add(GameEvent.LOCK)
         val lines = board.clearLines()
         if (lines > 0) {
             linesCleared += lines
             score += (SCORE_TABLE[lines] ?: 0) * (level + 1)
+            val oldLevel = level
             level = linesCleared / LINES_PER_LEVEL
+            if (level > oldLevel) events.add(GameEvent.LEVEL_UP)
+            if (lines >= 4) events.add(GameEvent.TETRIS) else events.add(GameEvent.LINE_CLEAR)
         }
         if (aboveTop || board.isGameOver()) {
             state = GameState.GAME_OVER
+            events.add(GameEvent.GAME_OVER)
             saveHighScore()
             return
         }

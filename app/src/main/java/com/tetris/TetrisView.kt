@@ -20,6 +20,7 @@ class TetrisView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr) {
 
     val game = Game()
+    val soundManager = SoundManager(context).also { it.loadAll() }
     private var highScoreSaved = false
 
     // ── Layout ──────────────────────────────────────────
@@ -101,6 +102,24 @@ class TetrisView @JvmOverloads constructor(
             tickDAS(now)
             game.update(dtMs)
 
+            // Play sounds for events
+            val evts = game.events.toList()
+            game.events.clear()
+            for (e in evts) {
+                when (e) {
+                    GameEvent.PIECE_MOVED -> soundManager.play(SoundManager.Sound.MOVE)
+                    GameEvent.PIECE_ROTATED -> soundManager.play(SoundManager.Sound.ROTATE)
+                    GameEvent.SOFT_DROP -> soundManager.play(SoundManager.Sound.SOFT_DROP)
+                    GameEvent.HARD_DROP -> soundManager.play(SoundManager.Sound.HARD_DROP)
+                    GameEvent.LOCK -> soundManager.play(SoundManager.Sound.LOCK)
+                    GameEvent.LINE_CLEAR -> soundManager.play(SoundManager.Sound.CLEAR)
+                    GameEvent.TETRIS -> soundManager.play(SoundManager.Sound.TETRIS)
+                    GameEvent.LEVEL_UP -> soundManager.play(SoundManager.Sound.LEVEL_UP)
+                    GameEvent.GAME_OVER -> soundManager.play(SoundManager.Sound.GAME_OVER)
+                    GameEvent.HOLD -> soundManager.play(SoundManager.Sound.HOLD)
+                }
+            }
+
             if (game.state == GameState.GAME_OVER && !highScoreSaved) {
                 val hs = game.saveHighScore()
                 if (hs > 0) listener?.onHighScoreUpdated(hs)
@@ -127,6 +146,7 @@ class TetrisView @JvmOverloads constructor(
 
     fun stopLoop() {
         handler.removeCallbacks(frameRunnable)
+        soundManager.release()
     }
 
     // ── Measure ────────────────────────────────────────
@@ -577,7 +597,7 @@ class TetrisView @JvmOverloads constructor(
                 lastTapTime = if (event.eventTime - lastTapTime < 300) 0 else event.eventTime
 
                 when {
-                    game.state == GameState.READY -> { game.startGame(); return true }
+                    game.state == GameState.READY -> { game.startGame(); soundManager.play(SoundManager.Sound.LEVEL_START); return true }
                     game.state == GameState.GAME_OVER -> { game.restart(); return true }
                 }
                 if (game.state != GameState.PLAYING) return true
