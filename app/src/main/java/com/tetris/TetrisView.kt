@@ -262,23 +262,23 @@ class TetrisView @JvmOverloads constructor(
         }
     }
 
-    private fun drawCell(canvas: Canvas, col: Int, row: Int, color: Int) {
+    private fun drawCell(canvas: Canvas, col: Int, row: Int, cellColor: Int) {
         val x = boardLeft + col * cellSize + 1f
         val y = boardTop + row * cellSize + 1f
         val s = cellSize - 2f
 
         // Fill
-        cellFillPaint.color = color
+        cellFillPaint.color = cellColor
         canvas.drawRect(x, y, x + s, y + s, cellFillPaint)
 
         // Inner highlight (top-left shine)
         val hl = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = lighten(color, 0.3f); style = Paint.Style.FILL; alpha = 60
+            this.color = lighten(cellColor, 0.3f); style = Paint.Style.FILL; alpha = 60
         }
         canvas.drawRect(x, y, x + s, y + s * 0.25f, hl)
 
         // Border
-        cellBorderPaint.color = lighten(color, 0.5f)
+        cellBorderPaint.color = lighten(cellColor, 0.5f)
         canvas.drawRect(x, y, x + s, y + s, cellBorderPaint)
     }
 
