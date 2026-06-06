@@ -8,7 +8,7 @@ import android.media.SoundPool
  * Manages all game sound effects via Android SoundPool.
  * Loads sounds from res/raw/ and provides named play methods.
  */
-class SoundManager(context: Context) {
+class SoundManager(private val context: Context) {
 
     private val pool: SoundPool
     private val loaded = mutableMapOf<String, Int>()
