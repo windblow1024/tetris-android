@@ -28,6 +28,7 @@ class Game {
     var lockTimer = 0f
     var lockMoves = 0
     var isLocking = false
+    var ghostEnabled = true
 
     private val bag = mutableListOf<Char>()
     private var highScoreLoaded = false
