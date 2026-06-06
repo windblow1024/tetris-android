@@ -6,11 +6,11 @@ import android.media.SoundPool
 
 /**
  * Manages all game sound effects via Android SoundPool.
- * Loads sounds from res/raw/ and provides named play methods.
+ * Handles lifecycle: pool is recreated on each loadAll().
  */
 class SoundManager(private val context: Context) {
 
-    private val pool: SoundPool
+    private var pool: SoundPool? = null
     private val loaded = mutableMapOf<String, Int>()
 
     enum class Sound(val resName: String) {
@@ -27,30 +27,32 @@ class SoundManager(private val context: Context) {
         HOLD("hold")
     }
 
-    init {
+    private fun createPool(): SoundPool {
         val attrs = AudioAttributes.Builder()
             .setUsage(AudioAttributes.USAGE_GAME)
             .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
             .build()
-        pool = SoundPool.Builder()
+        val p = SoundPool.Builder()
             .setMaxStreams(4)
             .setAudioAttributes(attrs)
             .build()
-
-        // Mark pool ready
-        pool.setOnLoadCompleteListener { _, _, status ->
+        p.setOnLoadCompleteListener { _, _, status ->
             if (status != 0) {
                 android.util.Log.w("SoundManager", "Sound load error: $status")
             }
         }
+        return p
     }
 
-    /** Preload all sounds — call once after AudioManager focus. */
+    /** Preload all sounds — safe to call after release(). */
     fun loadAll() {
+        release()
+        pool = createPool()
+        loaded.clear()
         for (sound in Sound.entries) {
             val resId = context.resources.getIdentifier(sound.resName, "raw", context.packageName)
             if (resId != 0) {
-                val soundId = pool.load(context, resId, 1)
+                val soundId = pool!!.load(context, resId, 1)
                 loaded[sound.resName] = soundId
             }
         }
@@ -58,14 +60,16 @@ class SoundManager(private val context: Context) {
 
     /** Play a sound by enum. Returns false if not loaded. */
     fun play(sound: Sound): Boolean {
+        val p = pool ?: return false
         val sid = loaded[sound.resName] ?: return false
-        pool.play(sid, 0.7f, 0.7f, 1, 0, 1f)
+        p.play(sid, 0.7f, 0.7f, 1, 0, 1f)
         return true
     }
 
     /** Release all resources. */
     fun release() {
-        pool.release()
+        pool?.release()
+        pool = null
         loaded.clear()
     }
 }

@@ -125,7 +125,8 @@ class TetrisView @JvmOverloads constructor(
     var listener: Listener? = null
 
     fun startLoop() {
-        highScoreSaved = false; lastFrameNanos = 0L; handler.post(frameRunnable)
+        highScoreSaved = false; lastFrameNanos = 0L; soundManager.loadAll()
+        handler.post(frameRunnable)
     }
 
     fun stopLoop() {
@@ -167,8 +168,8 @@ class TetrisView @JvmOverloads constructor(
         btnRects[BTN_SOFT].set(colW + padX, row1Y, colW + padX + btnW, row1Y + btnH)
         btnRects[BTN_RIGHT].set(colW * 2 + padX, row1Y, colW * 2 + padX + btnW, row1Y + btnH)
 
-        // Ghost toggle in right panel
-        ghostBtn.set(panelLeft + 6f, btnBarTop - 36f, panelRight - 6f, btnBarTop - 6f)
+        // Ghost toggle in right panel — just above button bar
+        ghostBtn.set(panelLeft + 6f, btnBarTop - 60f, panelRight - 6f, btnBarTop - 16f)
     }
 
     // Draw

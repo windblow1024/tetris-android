@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- T-piece shadow -->
+    <path
+        android:fillColor="#33000000"
+        android:pathData="M22,26 L72,26 L72,42 L56,42 L56,72 L42,72 L42,42 L22,42 Z"/>
+    <!-- T-piece main (purple) -->
+    <path
+        android:fillColor="#FF9933FF"
+        android:pathData="M24,28 L74,28 L74,44 L58,44 L58,74 L44,74 L44,44 L24,44 Z"/>
+    <!-- T-piece top highlight -->
+    <path
+        android:fillColor="#80CC88FF"
+        android:pathData="M24,28 L74,28 L74,34 L24,34 Z"/>
+    <!-- T-piece left highlight -->
+    <path
+        android:fillColor="#60BB66FF"
+        android:pathData="M24,28 L30,28 L30,44 L24,44 Z"/>
+</vector>

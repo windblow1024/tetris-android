@@ -33,7 +33,7 @@ class Game {
     var lockTimer = 0f
     var lockMoves = 0
     var isLocking = false
-    var ghostEnabled = true
+    var ghostEnabled = false
 
     val events = mutableListOf<GameEvent>()
     private val bag = mutableListOf<Char>()
