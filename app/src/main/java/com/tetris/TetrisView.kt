@@ -87,6 +87,7 @@ class TetrisView @JvmOverloads constructor(
     private val rotateBtn = RectF()
     private val hardBtn = RectF()
     private val holdBtn = RectF()
+    private val ghostBtn = RectF()
 
     // ── Game loop ──────────────────────────────────────
     private val handler = Handler(Looper.getMainLooper())
@@ -406,14 +407,27 @@ class TetrisView @JvmOverloads constructor(
         canvas.drawText("${game.linesCleared}", xx, top + lineH * 3 + 56f, textPaint)
     }
 
-    // ── Ghost toggle indicator ─────────────────────────
+    // ── Ghost toggle — tappable ───────────────────────
     private fun drawGhostIndicator(canvas: Canvas) {
-        val cx = panelCenterX; val pw = panelRight - panelLeft - 12f
-        val topBtn = btnBarTop - 28f
-        val text = if (game.ghostEnabled) "👻 ON" else "👻 OFF"
-        textPaint.textSize = 12f; textPaint.textAlign = Paint.Align.CENTER
-        textPaint.color = if (game.ghostEnabled) 0xAA66FF88.toInt() else 0xAA666666.toInt()
-        canvas.drawText(text, cx, topBtn, textPaint)
+        val cx = panelCenterX
+        val pw = 80f
+        val ph = 22f
+        val topBtn = btnBarTop - 30f
+        ghostBtn.set(cx - pw / 2, topBtn - ph, cx + pw / 2, topBtn + 4f)
+
+        val enabled = game.ghostEnabled
+        val bgColor = if (enabled) 0x4400FF88.toInt() else 0x33000000.toInt()
+        val borderColor = if (enabled) 0x8800FF88.toInt() else 0x44444444.toInt()
+        val r = ph / 2f
+
+        panelPaint.color = bgColor
+        canvas.drawRoundRect(ghostBtn, r, r, panelPaint)
+        panelStrokePaint.color = borderColor
+        canvas.drawRoundRect(ghostBtn, r, r, panelStrokePaint)
+
+        textPaint.textSize = 11f; textPaint.textAlign = Paint.Align.CENTER
+        textPaint.color = if (enabled) 0xFF88FFAA.toInt() else 0xFF888888.toInt()
+        canvas.drawText(if (enabled) "👻 ON" else "👻 OFF", cx, topBtn, textPaint)
     }
 
     // ── Buttons ─────────────────────────────────────────
@@ -515,7 +529,7 @@ class TetrisView @JvmOverloads constructor(
 
         // Controls hint
         textPaint.color = 0x55FFFFFF.toInt(); textPaint.textSize = 13f
-        val hints = arrayOf("←→ Move  |  ↑ Rotate  |  ↓ Soft  |  ␣ Hard  |  C Hold  |  G Ghost")
+        val hints = arrayOf("←→ Move  |  ↑ Rotate  |  ↓ Soft  |  ␣ Hard  |  C Hold")
         val yy = h * 0.75f
         for ((i, line) in hints.withIndex()) {
             canvas.drawText(line, w / 2f, yy + i * 18f, textPaint)
@@ -569,6 +583,7 @@ class TetrisView @JvmOverloads constructor(
                 if (game.state != GameState.PLAYING) return true
 
                 when {
+                    ghostBtn.contains(x, y) -> { game.ghostEnabled = !game.ghostEnabled }
                     leftBtn.contains(x, y) -> { game.moveLeft(); startDAS("left") }
                     rightBtn.contains(x, y) -> { game.moveRight(); startDAS("right") }
                     softBtn.contains(x, y) -> { game.softDrop(); startDAS("soft") }

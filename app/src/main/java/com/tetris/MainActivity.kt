@@ -76,7 +76,6 @@ class MainActivity : Activity(), TetrisView.Listener {
             KeyEvent.KEYCODE_C -> { game.hold(); true }
             KeyEvent.KEYCODE_P -> { game.togglePause(); true }
             KeyEvent.KEYCODE_R -> { game.restart(); true }
-            KeyEvent.KEYCODE_G -> { game.ghostEnabled = !game.ghostEnabled; true }
             else -> super.onKeyDown(keyCode, event)
         }
     }
